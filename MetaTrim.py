@@ -1,4 +1,5 @@
 ####MetaTrim####
+
 #by M. R. Snyder 2018. 
 #Written for Python 3
 #MetaTrim trims paired end metabarcoding reads returned from Illumina sequencing for subsequent merging in other programs such as Dada2, Unoise, or OBITools. MetaTrim works on the parent directory level. It should be run from the parent directory in which all of your subdirectories with Illumina sequencing results are stored. MetaTrim handles zipped fastq.gz files. It will deposit your trimmed meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published in Klymus et al. 2017 in Plos One, you can use those inserts to remove instances of index hops. The most effective method of library prep for removing index hops is to combine every forward spacer with every reverse spacer.

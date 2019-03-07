@@ -215,7 +215,11 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
         if __name__ == '__main__':
             exit()
 
-    DegPrimers (PrimerDict, ErrorDict)
+    try:
+        DegPrimerDict
+    except NameError:
+        DegPrimers (PrimerDict, ErrorDict)
+
     cwd = os.getcwd()
     basenm = os.path.basename(cwd)
     outsumname = basenm+'TrimSummary.txt'

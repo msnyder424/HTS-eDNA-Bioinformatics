@@ -442,7 +442,7 @@ if __name__ == "__main__":
                     elif re.search('R2_001', y):
                         InR = x+'/'+y
                         MetaTrim(InF, InR, sys.argv[1].upper(), sys.argv[3].upper(), sys.argv[4].upper(), sys.argv[4], sys.argv[5], LengthMarker, sys.argv[7])
-
+                    outsum.close()
     end = datetime.now().time()
     print ('MetaTrim start:', start, '\n', 'MetaTrim end:', end)
-    outsum.close()
+  

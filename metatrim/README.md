@@ -1,4 +1,4 @@
-#metatrim.py
+# metatrim.py #
 
 **by M. R. Snyder 2018.**
 
@@ -6,7 +6,7 @@
 
 ***MetaTrim*** is both a package with functions that can be called from a python interpreter and a stand alone script.
 
-##Stand alone scrip##
+## Stand alone scrip ##
 
 ***MetaTrim*** trims paired end metabarcoding reads returned from Illumina sequencing for subsequent merging in other programs such as Dada2, Unoise, or OBITools. ***MetaTrim*** works on the parent directory level. It should be run from the parent directory in which all of your subdirectories with Illumina sequencing results are stored. If you want to use individual functions from ***MetaTrim*** you can import it as a module. This allows you to trim individual sets of paired sequencing results files. ***MetaTrim*** handles zipped fastq.gz files. It will deposit your trimmed meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published in Klymus *et al.* 2017, *Plos One*, **12**(5): e0177643, you can use those inserts to remove instances of index hops. The most effective method of library prep for removing index hops is to combine every forward spacer with every reverse spacer.
 
@@ -30,7 +30,7 @@
 1. 'Remove'
 2. Primer_Set_Name
 
-##Using functions in an interpreter##
+## Using functions in an interpreter ##
 
 *To add a primer to the commonly used primer set list use **AddPrimer** and input the following argument vaiables:*
 1. Primer_Set Name

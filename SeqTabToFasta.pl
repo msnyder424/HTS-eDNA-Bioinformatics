@@ -6,7 +6,8 @@
 use Cwd;
 use File::Basename;
 
-my $BaseDir = 
+my $ParentDir = getcwd();
+my $BaseDir = basename($ParentDir);
 
 my $Out = "Dada2OTUSummary.txt";
 open (OUTSUM, ">", $Out) || die "Can't open $Out: $!\n";
@@ -16,7 +17,7 @@ $Infile = "SeqTab.txt";
 
 open (IN, $Infile) || die "Can't open $Infile: $!\n"; 
 
-$OTUsDir = "Dada2OTUs";
+$OTUsDir = $BaseDir."Dada2OTUs";
 mkdir $OTUsDir unless -d $OTUsDir;
 
 my $c=0;

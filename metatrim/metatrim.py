@@ -29,12 +29,12 @@ if __name__ != '__main__':
 #Primers in the list that comes with MetaTrim.py are from Snyder et al. 2019 "Invasive species in bait and pond stores: metabarcoding environmental DNA assays and angler, retailer, and manager implications"
 
 PrimerSets = {
-    'MIFISHPART': 'TCGTGCCAGC-TCCCAGTTTG-0',
-    'GFLPART': 'GMTCHATYCC-TGAATTGGNG-152',
-    'GOBYPART': 'TWAAAATYGC-ACRTCWCGRC-167',
-    'CARPPART': 'CYCTHCTAGG-CYCCRTTRGC-136',
-    'CARPCOMPLETE': 'TGATGAAAYTTYGGMTCYCTHCTAGG-AARAAGAATGATGCYCCRTTRGC-136',
-    'GOBYCOMPLETE': 'AACVCAYCCVCTVCTWAAAATYGC-AGYCANCCRAARTTWACRTCWCGRC-165',
+    'MIFISHPART': ['TCGTGCCAGC','TCCCAGTTTG','0'],
+    'GFLPART': ['GMTCHATYCC','TGAATTGGNG''152'],
+    'GOBYPART': ['TWAAAATYGC','ACRTCWCGRC','167'],
+    'CARPPART': ['CYCTHCTAGG','CYCCRTTRGC','136'],
+    'CARPCOMPLETE': ['TGATGAAAYTTYGGMTCYCTHCTAGG','AARAAGAATGATGCYCCRTTRGC','136'],
+    'GOBYCOMPLETE': ['AACVCAYCCVCTVCTWAAAATYGC','AGYCANCCRAARTTWACRTCWCGRC','165']
     }
 
 #EndPrimerSetList
@@ -43,22 +43,24 @@ IUPACAmb = {'R' : '[AG]', 'Y' : '[CT]', 'S' : '[GC]', 'W' : '[AT]', 'K' : '[GT]'
 
 #Add a new primer to the primer set list
 def AddPrimer(PrimerName, PF, PR, LenMarker):
-    NewOrNot = input("Would you like to rename this version of MetaTrim?(Y/N)").upper()
-    if NewOrNot == 'Y':
-        NewPyFileName = input("Name the new MetaTrim program file. Don't forget .py!")
-    else:
-        NewPyFileName = 'metatrim.py'
     if PrimerName in PrimerSets:
         print (PrimerName, "is already in the primer set list!")
         exit()
     else:
-        print ('Adding primer set:', PrimerName, 'F seq:', PF, 'R seq:', PR, 'Target length:', LenMarker)
+        NewOrNot = input("Would you like to rename this version of MetaTrim? Yes(Y), No(N), or Cancel (X)").upper()
+        if NewOrNot == 'Y':
+            NewPyFileName = input("Name the new MetaTrim program file. Don't forget .py!")
+        elif NewOrNot == 'N':
+            NewPyFileName = 'metatrim.py'
+        elif NewOrNot == 'X':
+            exit()
+        print ('Adding primer set:', PrimerName, 'F seq:', PF, 'R seq:', PR, 'Target length:', LenMarker, 'to python file', NewPyFileName)
         with open('metatrim.py', 'r') as pyfileOld:
             lines = pyfileOld.readlines()
         for indx, val in enumerate(lines):
             if re.search('PrimerSets \= \{', val):
                 NewPLineIndx = indx + 1
-                lines.insert(NewPLineIndx, "\t'"+PrimerName.upper()+"': '"+PF+"-"+PR+"-"+str(LenMarker)+"',\n")
+                lines.insert(NewPLineIndx, "\t'"+PrimerName.upper()+"': ['"+PF+"','"+PR+"','"+str(LenMarker)+"'],\n")
                 break
         with open(NewPyFileName, 'w') as pyfileNew:
             for i in lines:
@@ -66,17 +68,17 @@ def AddPrimer(PrimerName, PF, PR, LenMarker):
 
 #Remove a primer from the primer set list
 def RemovePrimer(PrimerName):
-    NewOrNot = input("Would you like to rename this version of MetaTrim?(Y/N)").upper()
-    if NewOrNot == 'Y':
-        NewPyFileName = input("Name the new MetaTrim program file. Don't forget .py!")
-    else:
-        NewPyFileName = 'metatrim.py'
     if not PrimerName.upper() in PrimerSets:
         print (PrimerName.upper(), "is not in the primer set list!")
         exit()
     else:
+        NewOrNot = input("Would you like to rename this version of MetaTrim?(Y/N)").upper()
+        if NewOrNot == 'Y':
+            NewPyFileName = input("Name the new MetaTrim program file. Don't forget .py!")
+        else:
+            NewPyFileName = 'metatrim.py'
         PrimerToRemove = "\t'"+PrimerName.upper()+"':"
-        print ('Removing primer set', PrimerName.upper())
+        print ('Removing primer set', PrimerName.upper(), 'from python file', NewPyFileName)
         with open('metatrim.py', 'r') as pyfileOld:
             lines = pyfileOld.readlines()
             for i in lines:
@@ -205,11 +207,10 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
         ErrorDict = {'pF': int(ErrF), 'pR': int(ErrR)}
     elif PrimerSet in PrimerSets:
         print ('Primer set is ', PrimerSet)
-        PrimerVars = PrimerSets[PrimerSet.upper()].split('-')
-        PrimerDict = {'pF': PrimerVars[0], 'pR': PrimerVars[1]}
+        PrimerDict = {'pF': PrimerSets[PrimerSet][0], 'pR': PrimerSets[PrimerSet][1]}
         ErrorDict = {'pF': int(ErrF), 'pR': int(ErrR)}
         if Length in PrimerSets:
-            Length = int(PrimerVars[2])
+            Length = int(PrimerSets[PrimerSet][2])
     elif PrimerSet not in PrimerSets:
         print (PrimerSet.upper(),"is not in the Primer Sets List!")
         if __name__ == '__main__':
@@ -455,4 +456,4 @@ if __name__ == "__main__":
 
         end = datetime.now().time()
         print ('MetaTrim start:', start, '\n', 'MetaTrim end:', end)
-    
+   

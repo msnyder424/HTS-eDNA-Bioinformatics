@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 #MetaTrim
 
 #by M. R. Snyder 2018. 
@@ -12,8 +13,7 @@
 #5. N errors allowed in reverse primer 
 #6. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.
 #7. 'Are you using spacer inserts as published in Klymus et al. 2017, Plos One?: Y/N'
-#To add a new primer set to the primer set list input the following argument vaiables: 1. 'New'. 2. Primer_Set Name, 3. forward sequence, 4. reverse sequence, 5. Length of the marker or input 0 (zero) if you want MetaTrim to always search for the opposite primer in each read. It is recommended that you input 8-10 bases of each primer. The sequence should end with the last 3' base of the primer.
-#To remove a primer set from the list input the following argument variables: 1. 'Remove'. 2. Primer_Set_Name
+#For more features see the README.md file (https://github.com/msnyder424/HTS-eDNA-Bioinformatics/edit/master/metatrim/README.md)
 
 import re
 from itertools import permutations
@@ -30,6 +30,12 @@ if __name__ != '__main__':
 #Primers in the list that comes with MetaTrim.py are from Snyder et al. 2019 "Invasive species in bait and pond stores: metabarcoding environmental DNA assays and angler, retailer, and manager implications"
 
 PrimerSets = {
+    'MIFISHPART-2': ['TCGTGCCAGCN','TCCCAGTTTGN','0'],
+    'ACTINPART-2': ['GMTCHATYCCN','TGAATTGGNGN','150'],
+    'GOBIPART-2': ['TWAAAATYGCN','ACRTCWCGRCN','165'],
+    'CYPPART-2': ['CYCTHCTAGGN','CYCCRTTRGCN','134'],
+    'CYPCOMPLETE': ['TGATGAAAYTTYGGMTCYCTHCTAGG','AARAAGAATGATGCYCCRTTRGC','136'],
+    'GOBICOMPLETE': ['AACVCAYCCVCTVCTWAAAATYGC','AGYCANCCRAARTTWACRTCWCGRC','165'],
     'MIFISHPART': ['TCGTGCCAGC','TCCCAGTTTG','0'],
     'ACTINPART': ['GMTCHATYCC','TGAATTGGNG','152'],
     'GOBIPART': ['TWAAAATYGC','ACRTCWCGRC','167'],
@@ -41,6 +47,11 @@ PrimerSets = {
 #EndPrimerSetList
 
 IUPACAmb = {'R' : '[AG]', 'Y' : '[CT]', 'S' : '[GC]', 'W' : '[AT]', 'K' : '[GT]', 'M' : '[AC]', 'B' : '[CGT]', 'D' : '[AGT]', 'H' : '[ACT]', 'V' : '[ACG]', 'N' : '[ATCG]'}
+
+def PrintPrimerSets():
+    print ('Primer Set\tFor Seq\tRev Seq\tLength')
+    for keys in PrimerSets:
+        print ('%s\t%s\t%s\t%s' % (keys, PrimerSets[keys][0], PrimerSets[keys][1], PrimerSets[keys][2]))
 
 #Add a new primer to the primer set list
 def AddPrimer(PrimerName, PF, PR, LenMarker):
@@ -381,7 +392,10 @@ if __name__ == "__main__":
     else:
         start = datetime.now().time()
         #Add a new primer to the primer set list
-        if sys.argv[1].upper() == 'NEW':
+        if sys.argv[1].upper() == 'PRIMERSETS':
+            PrintPrimerSets()
+            exit()
+        elif sys.argv[1].upper() == 'NEW':
             if len(sys.argv) == 6:
                 AddPrimer(sys.argv[2].upper(), sys.argv[3].upper(), sys.argv[4].upper(), sys.argv[5])
                 exit()

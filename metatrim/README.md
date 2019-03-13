@@ -25,6 +25,7 @@
 3. forward sequence
 4. reverse sequence
 5. Length of the marker or input 0 (zero) if you want ***MetaTrim*** to always search for the opposite primer in each read. 
+*It is recommended that you input 8-10 bases of each primer. The sequence should end with the last 3' base of the primer.*
 
 *To remove a primer set from the list input the following argument variables:*
 1. 'Remove'
@@ -37,6 +38,7 @@
 2. forward sequence
 3. reverse sequence
 4. Length of the marker or input 0 (zero) if you want ***MetaTrim*** to always search for the opposite primer in each read. 
+*It is recommended that you input 8-10 bases of each primer. The sequence should end with the last 3' base of the primer.*
 
 *To remove a primer from the commonly used primer set list use **RemovePrimer** and input the following argument vaiables:*
 1. Primer_Set Name

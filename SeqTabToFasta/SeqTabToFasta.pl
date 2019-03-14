@@ -6,17 +6,15 @@
 use Cwd;
 use File::Basename;
 
-my $BaseDir = basename(getcwd);
-
 my $Out = "Dada2OTUSummary.txt";
 open (OUTSUM, ">", $Out) || die "Can't open $Out: $!\n";
 print OUTSUM "Sample\tN no chim reads\tN no chim OTUs\n";
 
-$Infile = "SeqTab.txt";
+my $Infile = "SeqTab.txt";
 
 open (IN, $Infile) || die "Can't open $Infile: $!\n"; 
 
-$OTUsDir = $BaseDir."Dada2OTUs";
+my $OTUsDir = basename(getcwd)."Dada2OTUs";
 mkdir $OTUsDir unless -d $OTUsDir;
 
 my $c=0;
@@ -41,7 +39,7 @@ while (<IN>){
 		my $d=1;
 		my $Outfile = $OTUsDir."/"."$sample"."OTUs.fasta";
 		open (OUT, ">", $Outfile) || die "Can't open $Outfile: $!\n";
-		$totalcount = 0;
+		my $totalcount = 0;
 	    for $x (0..$#Seqs){
 	    	my $CurrCount = $Reads[$x];
 	    	$totalcount = $totalcount + $CurrCount;

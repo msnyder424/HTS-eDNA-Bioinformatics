@@ -6,8 +6,7 @@
 use Cwd;
 use File::Basename;
 
-my $ParentDir = getcwd();
-my $BaseDir = basename($ParentDir);
+my $BaseDir = basename(getcwd);
 
 my $Out = "Dada2OTUSummary.txt";
 open (OUTSUM, ">", $Out) || die "Can't open $Out: $!\n";

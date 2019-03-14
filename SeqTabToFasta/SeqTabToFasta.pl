@@ -58,7 +58,7 @@ while (<IN>){
 	}
 	$c++;
 }
-$nsamples = $c-1;
+my $nsamples = $c-1;
 print "$#Seqs unique sequences in $nsamples samples processed.\n";
 close IN;
 close OUTSUM;

@@ -1,0 +1,3 @@
+Sample	Reads	F Seqs Trimmed	R Seqs Trimmed	Seqs F & R Trimmed	Short Seqs	Seqs w/ Correct Spacer Combo	Seqs w/o Correct Spaer Combo
+cBKW02b	25000	22291	24890	22145	47	22194	2806
+cBKW05	50000	49186	49802	48998	14	48991	1009

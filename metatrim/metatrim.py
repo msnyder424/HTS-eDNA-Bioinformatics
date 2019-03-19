@@ -44,10 +44,7 @@ PrimerSets = {
     'GOBICOMPLETE': ['AACVCAYCCVCTVCTWAAAATYGC','AGYCANCCRAARTTWACRTCWCGRC','165']
     }
 
-#EndPrimerSetList
-
-IUPACAmb = {'R' : '[AG]', 'Y' : '[CT]', 'S' : '[GC]', 'W' : '[AT]', 'K' : '[GT]', 'M' : '[AC]', 'B' : '[CGT]', 'D' : '[AGT]', 'H' : '[ACT]', 'V' : '[ACG]', 'N' : '[ATCG]'}
-
+#Finction to print the primer sets in the primer set list.
 def PrintPrimerSets():
     print ('Primer Set\tFor Seq\tRev Seq\tLength')
     for keys in PrimerSets:
@@ -136,36 +133,14 @@ def SpacerCount(InFastq):
     MaxS = max(Count.items(), key=operator.itemgetter(1))[0]
     print (InFastq[0:re.search('_', InFastq).start()], ReadDirection, 'has spacer', MaxS)
 
-#Function to trim primers
-def TrimPrimers (Primer1,Primer2):
-    global name
-    global TargetStart
-    global TargetEnd
-    global TrimmedSeq
-    global Seq
-    global Qual
-    if re.search(DegPrimerDict[Primer1], readbuffer[1]):
-        name = readbuffer[0].split()
-        TargetStart = re.search(DegPrimerDict[Primer1], readbuffer[1]).end()
-        if Length == 0:
-            RevComp(readbuffer[1])
-            if re.search(DegPrimerDict[Primer2], SeqRC):
-                TargetEnd = len(readbuffer[1]) - re.search(DegPrimerDict[Primer2], SeqRC).end()
-            else:
-                TargetEnd = len(readbuffer[1])
-        else:
-            TargetEnd = TargetStart + int(Length)
-        Seq = readbuffer[1][TargetStart:TargetEnd]
-        Qual = readbuffer[3][TargetStart:TargetEnd]
-
-#Reverse compliment a sequence
+    #Reverse compliment a sequence
 def RevComp(Seq):
     global SeqRC
     trans = str.maketrans('ATGCN', 'TACGN')
     SeqRC = Seq[::-1].translate(trans)
 
-
 #Create degenerate primer regexes
+IUPACAmb = {'R' : '[AG]', 'Y' : '[CT]', 'S' : '[GC]', 'W' : '[AT]', 'K' : '[GT]', 'M' : '[AC]', 'B' : '[CGT]', 'D' : '[AGT]', 'H' : '[ACT]', 'V' : '[ACG]', 'N' : '[ATCG]'}
 def DegPrimers (PrimDict, ErrDict):
     global DegPrimerDict
     DegPrimerDict = {}
@@ -200,6 +175,28 @@ def DegPrimers (PrimDict, ErrDict):
             DegPrimers.append(''.join(DegCurr))
             DegPrim = '|'.join(DegPrimers)
         DegPrimerDict[keys] = '('+DegPrim+')'
+
+#Function to trim primers
+def TrimPrimers (Primer1,Primer2):
+    global name
+    global TargetStart
+    global TargetEnd
+    global TrimmedSeq
+    global Seq
+    global Qual
+    if re.search(DegPrimerDict[Primer1], readbuffer[1]):
+        name = readbuffer[0].split()
+        TargetStart = re.search(DegPrimerDict[Primer1], readbuffer[1]).end()
+        if Length == 0:
+            RevComp(readbuffer[1])
+            if re.search(DegPrimerDict[Primer2], SeqRC):
+                TargetEnd = len(readbuffer[1]) - re.search(DegPrimerDict[Primer2], SeqRC).end()
+            else:
+                TargetEnd = len(readbuffer[1])
+        else:
+            TargetEnd = TargetStart + int(Length)
+        Seq = readbuffer[1][TargetStart:TargetEnd]
+        Qual = readbuffer[3][TargetStart:TargetEnd]
 
 def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spacers):
     start = datetime.now().time()

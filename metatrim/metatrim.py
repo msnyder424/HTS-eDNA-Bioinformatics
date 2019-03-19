@@ -442,8 +442,6 @@ if __name__ == "__main__":
         #Read in items in parent directory
         ItemsInParentDir = os.listdir(".")
 
-        FirstDir = 1
-
         for x in ItemsInParentDir:
             #Open all subdirectories in parent directory
             if os.path.isdir(x):
@@ -458,7 +456,6 @@ if __name__ == "__main__":
                         elif re.search('R2_001\.fastq\.gz', y):
                             InR = x+'/'+y
                             MetaTrim(InF, InR, sys.argv[1].upper(), sys.argv[3].upper(), sys.argv[4].upper(), sys.argv[4], sys.argv[5], LengthMarker, sys.argv[7].upper())
-            FirstDir += 1
         outsum.close()
 
         end = datetime.now().time()

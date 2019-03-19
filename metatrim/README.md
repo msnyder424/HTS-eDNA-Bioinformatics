@@ -17,8 +17,8 @@
 Primer_Set: primer set name or "other" if it is not in the common primer set list. If a primer set name is entered, the next two argument variables will be ignored, but a value must be entered.  
 F_Seq: Last N bases of forward primer  
 R_Seq: Last N bases of reverse primer  
-F_Err: N errors allowed in forward primer  
-R_Err: N errors allowed in reverse primer   
+F_Err: N errors allowed in forward primer. ≥2 is recomended.  
+R_Err: N errors allowed in reverse primer. ≥2 is recomended.   
 Length: Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and ***MetaTrim*** will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. **WARNING:** if you choose to have ***MetaTrim*** search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.  
 Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos One?: Yes(Y) or No(N). This option allows the removal of index hops!  
 
@@ -26,11 +26,11 @@ Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos O
 #### *To trim primers from a single sample use ***MetaTrim*** from a python interpreter:* ####
 `MetaTrim(In_Forward In_Reverse Primer_Set F_Seq R_Seq F_Err R_Err Length Spacers)`
 
-In_Forward: Path to forward (R1_001.fastq.gz) file. ends  
-In_Reverse: Path to reverse (R2_001.fastq.gz) file. ends  
+In_Forward: Path to forward (R1_001.fastq.gz) file.    
+In_Reverse: Path to reverse (R2_001.fastq.gz) file.   
 Primer_Set: Primer set name or "other" if it is not in the common primer set list. If a primer set name is entered, the next two variables will be ignored, but a value must be entered.  
-F_Seq: Last N bases of forward primer  
-R_Seq: Last N bases of reverse primer  
+F_Seq: Last N bases of forward primer. ≥2 is recomended.  
+R_Seq: Last N bases of reverse primer. ≥2 is recomended.  
 F_Err: N errors allowed in forward primer  
 R_Err: N errors allowed in reverse primer  
 Length: Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and ***MetaTrim*** will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. **WARNING:** if you choose to have ***MetaTrim*** search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.  
@@ -61,3 +61,16 @@ or
 `RemovePrimer(Primer_Set_Name)`  
 
 Primer_Set_Name: Name of primer set to be removed
+
+## metatrimExampleData ##
+This folder contains some example data for users to familiarize themselves with the use of ***MetaTrim***. The two sub directories contain truncated gzipped fastq files. These samples can be trimmed with the *CYPPART* primer set with or without removing incorrect spacer inserts.  
+### *Example usage* ###  
+`python metatrim.py Primer_Set F_Seq R_Seq F_Err R_Err Length Spacers`  
+
+Primer_Set: 'CyPpArT'. Note: ***MetaTrim*** is case INsensitive.  
+F_Seq: Enter any value. ***MetaTrim*** will use the CYPPART primer set.  
+R_Seq: Enter any value. ***MetaTrim*** will use the CYPPART primer set.  
+F_Err: N errors allowed in forward primer. ≥2 is recomended.  
+R_Err: N errors allowed in reverse primer. ≥2 is recomended.   
+Length: ***MetaTrim*** will use the CYPPART primer set length unless you enter a value. You can enter any length, but a value of 0 will result in ***MetaTrim*** searching for both primers in every sequence.  
+Spacers: Enter 'Y' or 'N'.    

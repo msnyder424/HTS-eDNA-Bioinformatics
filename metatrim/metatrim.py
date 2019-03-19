@@ -1,19 +1,29 @@
 #!/usr/bin/env python
+"""
+MetaTrim
 
-#MetaTrim
+by M. R. Snyder 2018. 
+Written for Python 3
 
-#by M. R. Snyder 2018. 
-#Written for Python 3
-#MetaTrim trims paired end metabarcoding reads returned from Illumina sequencing for subsequent merging in other programs such as Dada2, Unoise, or OBITools. metatrim.py works on the parent directory level. It should be run from the parent directory in which all of your subdirectories with Illumina sequencing results are stored. If you want to use individual functions from MetaTrim you can import it as a module. This allows you to trim individual sets of paired sequencing results files. MetaTrim handles zipped fastq.gz files. It will deposit your trimmed meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published in Klymus et al. 2017 in Plos One, you can use those inserts to remove instances of index hops. The most effective method of library prep for removing index hops is to combine every forward spacer with every reverse spacer.
-# To use MetaTrim as a stand alone script input the following argument variables: 
-#1. primer set name or "other" if it is not in the common primer set list. If a primer set name is entered, argument variables 2 & 3 will be ignored, but a value must be entered.
-#2. Last N bases of forward primer 
-#3. Last N bases of reverse primer
-#4. N errors allowed in forward primer
-#5. N errors allowed in reverse primer 
-#6. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.
-#7. 'Are you using spacer inserts as published in Klymus et al. 2017, Plos One?: Y/N'
-#For more features see the README.md file (https://github.com/msnyder424/HTS-eDNA-Bioinformatics/edit/master/metatrim/README.md)
+MetaTrim trims paired end metabarcoding reads returned from Illumina sequencing for subsequent 
+merging in other programs such as Dada2, Unoise, or OBITools. metatrim.py works on the parent 
+directory level. It should be run from the parent directory in which all of your subdirectories 
+with Illumina sequencing results are stored. If you want to use individual functions from MetaTrim 
+you can import it as a module. This allows you to trim individual sets of paired sequencing results 
+files. MetaTrim handles zipped fastq.gz files from a python interpreter. It will deposit your trimmed 
+meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory 
+name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published 
+in Klymus et al. 2017 in Plos One "Environmental DNA (eDNA) metabarcoding assays to detect invasive invertebrate 
+speciesin the Great Lakes" (https://doi.org/10.1371/journal.pone.0177643), you can use those inserts to remove 
+instances of index hops. The most effective method of library prep for removing index hops is to combine every 
+forward spacer with every reverse spacer.
+
+Refer to the MetaTrim README.md for usage:
+https://github.com/msnyder424/HTS-eDNA-Bioinformatics/blob/master/metatrim/README.md
+
+Example data is available at:
+https://github.com/msnyder424/HTS-eDNA-Bioinformatics/tree/master/metatrim
+"""
 
 import re
 from itertools import permutations
@@ -24,11 +34,41 @@ import operator
 from datetime import datetime
 
 if __name__ != '__main__':
-    print("MetaTrim takes the following variables:\n1. primer set name or 'other' if it is not in the common primer set list. If a primer set name is entered, argument variables 2 & 3 will be ignored, but a value must be entered.\n2. Last N bases of forward primer (recomended >= 8)\n3. Last N bases of reverse primer (recomended >= 8)\n4. N errors allowed in forward primer (recomended >=1)\n5. N errors allowed in reverse primer (recomended >=1)\n6. Length of marker. If you wish to use the length associated with a primer set, input the primer set name. If length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if your marker is much shorter than the read length, you should ensure that the oposite primer sequence is not found in the Illumina sequencing primer or in any region after it's intended location.\n7. Are you using spacer inserts as published in Klymus et al. 2018, Plos One?: Y/N\n\nTo add a new primer set to the primer set list use AddPrimer and input the following vaiables: 1. Primer_Set Name, 2. Forward sequence, 3. Reverse sequence, 4. Length of the marker or input 0 if you want MetaTrim to always search for the opposite primer in each read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should ensure it is never found at any other location than is intended. This is most problematic when your target can be very short and the oposite primer is found within the Illumina sequencing primer.\nTo remove a primer set from the list use RemovePrimer and imput the following variables: 1. Primer_Set_Name")
-
-#PrimerSetList: this list contains commonly used primer sets. Each key is the primer set name. The value has structure 'ForwardSequence-ReverseSequence-MarkerLength' See MetaTrimREADME for more info.
-#Primers in the list that comes with MetaTrim.py are from Snyder et al. 2019 "Invasive species in bait and pond stores: metabarcoding environmental DNA assays and angler, retailer, and manager implications"
-
+    print("MetaTrim takes the following variables:\n\
+        1. primer set name or 'other' if it is not in the \
+        common primer set list. If a primer set name is entered, argument variables 2 & 3 will be ignored, \
+        but a value must be entered.\n\
+        2. Last N bases of forward primer (recomended >= 8)\n\
+        3. Last N bases of reverse primer (recomended >= 8)\n\
+        4. N errors allowed in forward primer (recomended >=1)\n\
+        5. N errors allowed in reverse primer (recomended >=1)\n\
+        6. Length of marker. If you wish to use the length associated with a primer set, input the primer \
+        set name. If length is variable, enter 0 and MetaTrim will search for the opposite primer in each \
+        forward and reverse read. If the primer is not found it will take the remainder of the sequence \
+        after the first primer is found. \
+        WARNING: if your marker is much shorter than the read length, you should ensure that the oposite primer \
+        sequence is not found in the Illumina sequencing primer or in any region after it's intended \
+        location.\n\
+        7. Are you using spacer inserts as published in Klymus et al. 2018, Plos One?: Y/N\n\n\
+        To add a new primer set to the primer set list use AddPrimer and input the following vaiables: \
+        1. Primer_Set Name, \
+        2. Forward sequence, \
+        3. Reverse sequence, \
+        4. Length of the marker, primer set name (to use the stored length), or input 0 if you want MetaTrim \
+        to always search for the opposite primer in each read. If the primer is not found it will take the \
+        remainder of the sequence after the first primer is found. \
+        WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should \
+        ensure it is never found at any other location than is intended. This is most problematic when \
+        your target can be very short and the oposite primer is found within the Illumina sequencing primer.\n\
+        To remove a primer set from the list use RemovePrimer and imput the following variables: \
+        1. Primer_Set_Name")
+"""
+PrimerSets: this dictionary contains commonly used primer sets. Each key is the primer set name.
+The value is a list with structure ['ForwardSequence', 'ReverseSequence', 'MarkerLength']. See MetaTrimREADME for more info.
+Primers in the list that comes with MetaTrim.py are from Snyder et al. 2019 
+"Invasive species in bait and pond stores: metabarcoding environmental DNA assays and angler, 
+retailer, and manager implications"
+"""
 PrimerSets = {
     'MIFISHPART-2': ['TCGTGCCAGCN','TCCCAGTTTGN','0'],
     'ACTINPART-2': ['GMTCHATYCCN','TGAATTGGNGN','150'],
@@ -44,7 +84,7 @@ PrimerSets = {
     'GOBICOMPLETE': ['AACVCAYCCVCTVCTWAAAATYGC','AGYCANCCRAARTTWACRTCWCGRC','165']
     }
 
-#Finction to print the primer sets in the primer set list.
+#Finction to print primer sets in the primer set list
 def PrintPrimerSets():
     print ('Primer Set\tFor Seq\tRev Seq\tLength')
     for keys in PrimerSets:
@@ -63,7 +103,8 @@ def AddPrimer(PrimerName, PF, PR, LenMarker):
             NewPyFileName = 'metatrim.py'
         elif NewOrNot == 'X':
             exit()
-        print ('Adding primer set:', PrimerName, 'F seq:', PF, 'R seq:', PR, 'Target length:', LenMarker, 'to python file', NewPyFileName)
+        print ('Adding primer set:', PrimerName, 'F seq:', PF, 'R seq:', PR, 'Target length:', \
+            LenMarker, 'to python file', NewPyFileName)
         with open('metatrim.py', 'r') as pyfileOld:
             lines = pyfileOld.readlines()
         for indx, val in enumerate(lines):
@@ -100,8 +141,16 @@ def RemovePrimer(PrimerName):
                 pyfileNew.write(i)
 
 #Function for counting correct spacer insert
-FSpacers = {'e': '(TCCT|[ATCGN]CCT|T[ATCGN]CT|TC[ATCGN]T|TCC[ATCGN])', 'f': '(ATGC|[ATCGN]TGC|A[ATCGN]GC|AT[ATCGN]C|ATG[ATCGN])', 'g': '(CGAG|[ATCGN]GAG|C[ATCGN]AG|CG[ATCGN]G|CGA[ATCGN])', 'h': '(GATA|[ATCGN]ATA|G[ATCGN]TA|GA[ATCGN]A|GAT[ATCGN])'}
-RSpacers = {'e': '(CGTA|[ATCGN]GTA|C[ATCGN]TA|CG[ATCGN]A|CGT[ATCGN])', 'f': '(TCAC|[ATCGN]CAC|T[ATCGN]AC|TC[ATCGN]C|TCA[ATCGN])', 'g': '(GAGT|[ATCGN]AGT|G[ATCGN]GT|GA[ATCGN]T|GAG[ATCGN])', 'h': '(ATCG|[ATCGN]TCG|A[ATCGN]CG|AT[ATCGN]G|ATC[ATCGN])'}
+FSpacers = {'e': '(TCCT|[ATCGN]CCT|T[ATCGN]CT|TC[ATCGN]T|TCC[ATCGN])', 
+            'f': '(ATGC|[ATCGN]TGC|A[ATCGN]GC|AT[ATCGN]C|ATG[ATCGN])', 
+            'g': '(CGAG|[ATCGN]GAG|C[ATCGN]AG|CG[ATCGN]G|CGA[ATCGN])', 
+            'h': '(GATA|[ATCGN]ATA|G[ATCGN]TA|GA[ATCGN]A|GAT[ATCGN])'
+            }
+RSpacers = {'e': '(CGTA|[ATCGN]GTA|C[ATCGN]TA|CG[ATCGN]A|CGT[ATCGN])', 
+            'f': '(TCAC|[ATCGN]CAC|T[ATCGN]AC|TC[ATCGN]C|TCA[ATCGN])', 
+            'g': '(GAGT|[ATCGN]AGT|G[ATCGN]GT|GA[ATCGN]T|GAG[ATCGN])', 
+            'h': '(ATCG|[ATCGN]TCG|A[ATCGN]CG|AT[ATCGN]G|ATC[ATCGN])'
+            }
 
 def SpacerCount(InFastq):
     Count = {'e': 0, 'f': 0, 'g': 0, 'h': 0}
@@ -115,7 +164,8 @@ def SpacerCount(InFastq):
     elif re.search('R2_001\.fastq\.gz', InFastq):
         ReadDirection = 'reverse'
         Spacer = RSpacers
-    print ('Removing index hops based on incorrect spacer insert in sample', InFastq[0:re.search('_', InFastq).start()], ReadDirection)
+    print ('Removing index hops based on incorrect spacer insert in sample', \
+        InFastq[0:re.search('_', InFastq).start()], ReadDirection)
     with gzip.open(InFastq) as infile:
         for line in infile:
             readbuffer.append(line.strip().decode('ascii'))
@@ -133,14 +183,26 @@ def SpacerCount(InFastq):
     MaxS = max(Count.items(), key=operator.itemgetter(1))[0]
     print (InFastq[0:re.search('_', InFastq).start()], ReadDirection, 'has spacer', MaxS)
 
-    #Reverse compliment a sequence
+#Reverse compliment a sequence
 def RevComp(Seq):
     global SeqRC
     trans = str.maketrans('ATGCN', 'TACGN')
     SeqRC = Seq[::-1].translate(trans)
 
+
 #Create degenerate primer regexes
-IUPACAmb = {'R' : '[AG]', 'Y' : '[CT]', 'S' : '[GC]', 'W' : '[AT]', 'K' : '[GT]', 'M' : '[AC]', 'B' : '[CGT]', 'D' : '[AGT]', 'H' : '[ACT]', 'V' : '[ACG]', 'N' : '[ATCG]'}
+IUPACAmb = {'R' : '[AG]', 
+            'Y' : '[CT]', 
+            'S' : '[GC]', 
+            'W' : '[AT]', 
+            'K' : '[GT]', 
+            'M' : '[AC]', 
+            'B' : '[CGT]', 
+            'D' : '[AGT]', 
+            'H' : '[ACT]', 
+            'V' : '[ACG]', 
+            'N' : '[ATCG]'
+            }
 def DegPrimers (PrimDict, ErrDict):
     global DegPrimerDict
     DegPrimerDict = {}
@@ -239,7 +301,8 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
     if __name__ != '__main__':
         outsum = open(outsumname, "w")
         if Spacers == 'Y':
-            outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\tSeqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
+            outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\t\
+                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
         else:
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\n')
     else:
@@ -370,7 +433,8 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
         if Spacers == 'Y':
             CorrSpacerCount = sum(CorSpacer.values())
             IncorrSpacerCount = reads - CorrSpacerCount
-            outsum.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (sample, reads, len(FSeqs), RSeqs, FinalSeqs, Shorts, CorrSpacerCount, IncorrSpacerCount))
+            outsum.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (sample, reads, len(FSeqs), RSeqs, \
+                FinalSeqs, Shorts, CorrSpacerCount, IncorrSpacerCount))
         else:
             outsum.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (sample, reads, len(FSeqs), RSeqs, FinalSeqs, Shorts))
     else:
@@ -385,7 +449,37 @@ if __name__ == "__main__":
     try: 
         sys.argv[1]
     except IndexError:
-        print("To use input the following argument variables:\n1. primer set name or 'other' if it is not in the common primer set list. If a primer set name is entered, argument variables 2 & 3 will be ignored, but a value must be entered.\n2. Last N bases of forward primer (recomended >= 8)\n3. Last N bases of reverse primer (recomended >= 8)\n4. N errors allowed in forward primer (recomended >=1)\n5. N errors allowed in reverse primer (recomended >=1)\n6. Length of marker. If you wish to use the length associated with a primer set, input the primer set name. If length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if your marker is much shorter than the read length, you should ensure that the oposite primer sequence is not found in the Illumina sequencing primer or in any region after it's intended location.\n7. Are you using spacer inserts as published in Klymus et al. 2018, Plos One?: Y/N\n\nTo add a new primer set to the primer set list input the following argument vaiables: 1. 'New' in primer set. 2. Primer_Set Name, 3. Forward sequence, 4. Reverse sequence, 5. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should ensure it is never found at any other location than is intended. This is most problematic when your target can be very short and the oposite primer is found within the Illumina sequencing primer. It is recommended that you input >8 bases of each primer. the sequence should end with the last 3' base of the primer.\nTo remove a primer set from the list input the following argument variables: 1. Remove. 2. Primer_Set_Name")
+        print("To use input the following argument variables:\n\
+            1. primer set name or 'other' if it is not in the common primer set list. \
+            If a primer set name is entered, argument variables 2 & 3 will \
+            be ignored, but a value must be entered.\n\
+            2. Last N bases of forward primer (recomended >= 8)\n\
+            3. Last N bases of reverse primer (recomended >= 8)\n\
+            4. N errors allowed in forward primer (recomended >=1)\n\
+            5. N errors allowed in reverse primer (recomended >=1)\n6. Length of marker. If you wish to use \
+            the length associated with a primer set, input the primer set name. If length is variable, \
+            enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. \
+            If the primer is not found it will take the remainder of the sequence after the first primer \
+            is found. WARNING: if your marker is much shorter than the read length, you should ensure that the \
+            oposite primer sequence is not found in the Illumina sequencing primer or in any region after it's \
+            intended location.\n\
+            7. Are you using spacer inserts as published in Klymus et al. 2018, Plos One?: Y/N\n\n\
+            To add a new primer set to the primer set list input the following argument vaiables: \
+            1. 'New' in primer set. \
+            2. Primer_Set Name, \
+            3. Forward sequence, \
+            4. Reverse sequence, \
+            5. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 \
+            and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is \
+            not found it will take the remainder of the sequence after the first primer is found. \
+            WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should \
+            ensure it is never found at any other location than is intended. This is most problematic when \
+            your target can be very short and the oposite primer is found within the Illumina sequencing primer. \
+            It is recommended that you input >8 bases of each primer. the sequence should end with the last \
+            3' base of the primer.\n\
+            To remove a primer set from the list input the following argument variables: \
+            1. Remove. \
+            2. Primer_Set_Name")
     else:
         start = datetime.now().time()
         #Add a new primer to the primer set list
@@ -397,7 +491,17 @@ if __name__ == "__main__":
                 AddPrimer(sys.argv[2].upper(), sys.argv[3].upper(), sys.argv[4].upper(), sys.argv[5])
                 exit()
             else:
-                print ("To add a new primer set to the primer set list input the following argument vaiables: 1. 'New'. 2. Primer_Set Name, 3. Forward sequence, 4. Reverse sequence, 5. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should ensure it is never found at any other location than is intended. This is most problematic when your target can be very short and the oposite primer is found within the Illumina sequencing primer. It is recommended that you input >8 bases of each primer. the sequence should end with the last 3' base of the primer.")
+                print ("To add a new primer set to the primer set list input the following argument vaiables: \
+                    1. 'New'. 2. Primer_Set Name, \
+                    3. Forward sequence, 4. Reverse sequence, \
+                    5. Length of marker OR primer set name to use a predefined length OR if length is variable, \
+                    enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. \
+                    If the primer is not found it will take the remainder of the sequence after the first primer \
+                    is found. WARNING: if you choose to have MetaTrim search for the oposite primer in each read, \
+                    you should ensure it is never found at any other location than is intended. This is most \
+                    problematic when your target can be very short and the oposite primer is found within the \
+                    Illumina sequencing primer. It is recommended that you input >8 bases of each primer. the \
+                    sequence should end with the last 3' base of the primer.")
 
         #Remove a primer from the primer set list
         elif sys.argv[1].upper() == 'REMOVE':
@@ -405,10 +509,41 @@ if __name__ == "__main__":
                 RemovePrimer(sys.argv[2].upper())
                 exit()
             else:
-                print("To remove a primer set from the list input the following argument variables: 1. 'Remove'. 2. Primer_Set_Name")
+                print("To remove a primer set from the list input the following argument variables: \
+                    1. 'Remove'. \
+                    2. Primer_Set_Name")
 
         elif len(sys.argv) != 8:
-            print("To use input the following argument variables:\n1. primer set name or 'other' if it is not in the common primer set list. If a primer set name is entered, argument variables 2 & 3 will be ignored, but a value must be entered.\n2. Last N bases of forward primer (recomended >= 8)\n3. Last N bases of reverse primer (recomended >= 8)\n4. N errors allowed in forward primer (recomended >=1)\n5. N errors allowed in reverse primer (recomended >=1)\n6. Length of marker. If you wish to use the length associated with a primer set, input the primer set name. If length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if your marker is much shorter than the read length, you should ensure that the oposite primer sequence is not found in the Illumina sequencing primer or in any region after it's intended location.\n7. Are you using spacer inserts as published in Klymus et al. 2018, Plos One?: Y/N\n\nTo add a new primer set to the primer set list input the following argument vaiables: 1. 'New'. 2. Primer_Set Name, 3. Forward sequence, 4. Reverse sequence, 5. Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should ensure it is never found at any other location than is intended. This is most problematic when your target can be very short and the oposite primer is found within the Illumina sequencing primer. It is recommended that you input >8 bases of each primer. the sequence should end with the last 3' base of the primer.\nTo remove a primer set from the list input the following argument variables: 1. 'Remove'. 2. Primer_Set_Name")
+            print("To use input the following argument variables:\n\
+                1. primer set name or 'other' if it is not in the common primer set list. \
+                If a primer set name is entered, argument variables 2 & 3 will be ignored, but a value must be entered.\n\
+                2. Last N bases of forward primer (recomended >= 8)\n\
+                3. Last N bases of reverse primer (recomended >= 8)\n\
+                4. N errors allowed in forward primer (recomended >=1)\n\
+                5. N errors allowed in reverse primer (recomended >=1)\n\
+                6. Length of marker. If you wish to use the length associated with a primer set, input the primer \
+                set name. If length is variable, enter 0 and MetaTrim will search for the opposite primer in each \
+                forward and reverse read. If the primer is not found it will take the remainder of the sequence after \
+                the first primer is found. WARNING: if your marker is much shorter than the read length, you should \
+                ensure that the oposite primer sequence is not found in the Illumina sequencing primer or in any \
+                region after it's intended location.\n7. Are you using spacer inserts as published in Klymus et al. \
+                2018, Plos One?: Y/N\n\n\
+                To add a new primer set to the primer set list input the following argument vaiables: \
+                1. 'New'. \
+                2. Primer_Set Name, \
+                3. Forward sequence, \
+                4. Reverse sequence, \
+                5. Length of marker OR primer set name to use a predefined length OR if length is variable, \
+                enter 0 and MetaTrim will search for the opposite primer in each forward and reverse read. \
+                If the primer is not found it will take the remainder of the sequence after the first primer is found. \
+                WARNING: if you choose to have MetaTrim search for the oposite primer in each read, you should \
+                ensure it is never found at any other location than is intended. This is most problematic when \
+                your target can be very short and the oposite primer is found within the Illumina sequencing primer. \
+                It is recommended that you input >8 bases of each primer. the sequence should end with the last 3' \
+                base of the primer.\n\
+                To remove a primer set from the list input the following argument variables: \
+                1. 'Remove'. \
+                2. Primer_Set_Name")
             exit()
         else:
             if sys.argv[6].isnumeric():
@@ -418,14 +553,16 @@ if __name__ == "__main__":
                 if LengthMarker not in PrimerSets:
                     print("Length ", LengthMarker," is not in the primer sets list!")
                     exit()
-    
-        #Create output directory and summary files
         cwd = os.getcwd()
+    # def MetaTrimAll(Dir, PrimerSetAll, PFAll, PRAll, ErrFAll, ErrRAll, TargetLenAll, SpacersAll)
+        #Create output directory and summary files
+        
         basenm = os.path.basename(cwd)
         outsumname = basenm+'TrimSummary.txt'
         outsum = open(outsumname, "w")
         if sys.argv[7].upper() == 'Y':
-            outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\tSeqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
+            outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\t\
+                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
             outsum.close()
         else:
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\n')
@@ -455,7 +592,8 @@ if __name__ == "__main__":
                             InF = x+'/'+y
                         elif re.search('R2_001\.fastq\.gz', y):
                             InR = x+'/'+y
-                            MetaTrim(InF, InR, sys.argv[1].upper(), sys.argv[3].upper(), sys.argv[4].upper(), sys.argv[4], sys.argv[5], LengthMarker, sys.argv[7].upper())
+                            MetaTrim(InF, InR, sys.argv[1].upper(), sys.argv[3].upper(), sys.argv[4].upper(), \
+                                sys.argv[4], sys.argv[5], LengthMarker, sys.argv[7].upper())
         outsum.close()
 
         end = datetime.now().time()

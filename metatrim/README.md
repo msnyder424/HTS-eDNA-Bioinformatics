@@ -36,6 +36,11 @@ R_Err: N errors allowed in reverse primer
 Length: Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and ***MetaTrim*** will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. **WARNING:** if you choose to have ***MetaTrim*** search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.  
 Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos One?: Yes(Y) or No(N). This option allows the removal of index hops!  
 
+#### *To count spacers in a single fastq file* ####
+*This feature is a function that cannot be called directly from __main__*  
+`SpacerCount(In_fastq.gz)`  
+
+In_fastq.gz: Path to fastq.gz file for which you want to count spacers.
 
 #### *To view primer sets in the primer set list input:* ####
 `python metatrim.py PrimerSets`  

@@ -423,8 +423,8 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
                             RSeqs += 1
                         if name[0] in FSeqs:
                             if len(Seq) > 100:
-                                Foutfile.write("%s\n%s\n+\n%s" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
-                                Routfile.write("%s\n%s\n+\n%s" % (readbuffer[0],Seq,Qual))
+                                Foutfile.write("%s\n%s\n+\n%s\n" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
+                                Routfile.write("%s\n%s\n+\n%s\n" % (readbuffer[0],Seq,Qual))
                                 FinalSeqs += 1
                             else:
                                 Shorts += 1

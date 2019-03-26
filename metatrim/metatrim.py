@@ -259,6 +259,8 @@ def TrimPrimers (Primer1,Primer2):
             TargetEnd = TargetStart + int(Length)
         Seq = readbuffer[1][TargetStart:TargetEnd]
         Qual = readbuffer[3][TargetStart:TargetEnd]
+    else:
+        Seq = ''
 
 def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spacers):
     start = datetime.now().time()

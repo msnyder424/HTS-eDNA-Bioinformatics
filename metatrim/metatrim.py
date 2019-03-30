@@ -316,7 +316,7 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
         outsum = open(outsumname, "w")
         if Spacers == 'Y':
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\t\
-                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
+                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spacer Combo\n')
         else:
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\n')
     else:
@@ -578,7 +578,7 @@ if __name__ == "__main__":
         outsum = open(outsumname, "w")
         if sys.argv[7].upper() == 'Y':
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\t\
-                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spaer Combo\n')
+                Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spacer Combo\n')
             outsum.close()
         else:
             outsum.write('Sample\tReads\tF Seqs Trimmed\tR Seqs Trimmed\tSeqs F & R Trimmed\tShort Seqs\n')

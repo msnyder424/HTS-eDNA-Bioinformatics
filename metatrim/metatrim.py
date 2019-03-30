@@ -212,32 +212,35 @@ def DegPrimers (PrimDict, ErrDict):
         DegPrimers = []
         PrimCurr = list(PrimDict[keys])
         PrimDegDict = {}
-        for err in range(0, ErrDict[keys]+1):
-            PrimDeg = []
-            for bp in range(len(PrimDict[keys])):
-                if bp < err:
-                    PrimDeg.append(0)
-                else:
-                    PrimDeg.append(1)
-            Perms = permutations(PrimDeg)
-            for i in Perms:
-                if i in PrimDegDict:
-                    continue
-                else:
-                    PrimDegDict[i] = 1
-        for i in PrimDegDict:
-            DegCurr = list(i)
-            for n in range(len(DegCurr)):
-                if DegCurr[n] == 0:
-                    DegCurr[n] = '[ACTGN]'
-                else:
-                    if PrimCurr[n] in IUPACAmb:  
-                        DegCurr[n] = IUPACAmb[PrimCurr[n]]
+        if ErrDict[keys] > 0:
+            for err in range(0, ErrDict[keys]+1):
+                PrimDeg = []
+                for bp in range(len(PrimDict[keys])):
+                    if bp < err:
+                        PrimDeg.append(0)
                     else:
-                        DegCurr[n] = PrimCurr[n]
-            DegPrimers.append(''.join(DegCurr))
-            DegPrim = '|'.join(DegPrimers)
-        DegPrimerDict[keys] = '('+DegPrim+')'
+                        PrimDeg.append(1)
+                Perms = permutations(PrimDeg)
+                for i in Perms:
+                    if i in PrimDegDict:
+                        continue
+                    else:
+                        PrimDegDict[i] = 1
+            for i in PrimDegDict:
+                DegCurr = list(i)
+                for n in range(len(DegCurr)):
+                    if DegCurr[n] == 0:
+                        DegCurr[n] = '[ACTGN]'
+                    else:
+                        if PrimCurr[n] in IUPACAmb:  
+                            DegCurr[n] = IUPACAmb[PrimCurr[n]]
+                        else:
+                            DegCurr[n] = PrimCurr[n]
+                DegPrimers.append(''.join(DegCurr))
+                DegPrim = '|'.join(DegPrimers)
+            DegPrimerDict[keys] = '('+DegPrim+')'
+        else:
+            DegPrimerDict[keys] = PrimerDict[keys] 
 
 #Function to trim primers
 def TrimPrimers (Primer1,Primer2):
@@ -262,6 +265,7 @@ def TrimPrimers (Primer1,Primer2):
         Qual = readbuffer[3][TargetStart:TargetEnd]
     else:
         Seq = 'X'
+        name = readbuffer[0].split()
 
 def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spacers):
     start = datetime.now().time()
@@ -291,20 +295,22 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
         if __name__ == '__main__':
             exit()
 
-    #Create Ddegenerate primer regex if it does not already exist
-    try:
-        DegPrimerDict
-    except NameError:
-        DegPrimers (PrimerDict, ErrorDict)
-
     #Determine length of sequences to remove
     try:
         cutoff
     except NameError:
         if Length > 125:
             cutoff = 100
-        else:
+        elif Length != 0:
             cutoff = Length * 0.75
+        elif Length == 0:
+            cutoff = int(input('What size of sequences should be considered primer dimer and removed?'))
+
+    #Create Ddegenerate primer regex if it does not already exist
+    try:
+        DegPrimerDict
+    except NameError:
+        DegPrimers (PrimerDict, ErrorDict)
 
     cwd = os.getcwd()
     basenm = os.path.basename(cwd)
@@ -360,11 +366,13 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
                             print ('Read:', reads, end='\r')
                         if re.match(FSpacers[FMax], readbuffer[1]):
                             TrimPrimers('pF','pR')
-                            if len(Seq) > cutoff:
-                                FNames[name[0]] = readbuffer[0]
-                                FSeqs[name[0]] = Seq
-                                FQuals[name[0]] = Qual
-                                CorSpacer[name[0]] = 1
+                            if re.match('[ATCGN]', Seq):
+                                nFSeqs += 1
+                                if len(Seq) > cutoff:
+                                    FNames[name[0]] = readbuffer[0]
+                                    FSeqs[name[0]] = Seq
+                                    FQuals[name[0]] = Qual
+                                    CorSpacer[name[0]] = 1
                         readbuffer = []
             print(reads, 'total raw reads.')
         else:
@@ -380,10 +388,10 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
                         TrimPrimers('pF','pR')
                         if re.match('[ATCGN]', Seq):
                             nFSeqs += 1
-                        if len(Seq) > cutoff:
-                            FNames[name[0]] = readbuffer[0]
-                            FSeqs[name[0]] = Seq
-                            FQuals[name[0]] = Qual
+                            if len(Seq) > cutoff:
+                                FNames[name[0]] = readbuffer[0]
+                                FSeqs[name[0]] = Seq
+                                FQuals[name[0]] = Qual
                         readbuffer = []
                 print(reads, 'total raw reads.')
     else:
@@ -411,13 +419,13 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
                             TrimPrimers('pR','pF')
                             if re.match('[ATCGN]', Seq):
                                 RSeqs += 1
-                            if name[0] in FSeqs:
-                                if len(Seq) > cutoff:
-                                    Foutfile.write("%s\n%s\n+\n%s\n" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
-                                    Routfile.write("%s\n%s\n+\n%s\n" % (readbuffer[0],Seq,Qual))
-                                    FinalSeqs += 1
-                                else:
-                                    Shorts += 1
+                                if name[0] in FSeqs:
+                                    if len(Seq) > cutoff:
+                                        Foutfile.write("%s\n%s\n+\n%s\n" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
+                                        Routfile.write("%s\n%s\n+\n%s\n" % (readbuffer[0],Seq,Qual))
+                                        FinalSeqs += 1
+                                    else:
+                                        Shorts += 1
                         else:
                             CorSpacer[name[0]] = 0
                         readbuffer = []
@@ -435,13 +443,13 @@ def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spa
                         TrimPrimers('pR','pF')
                         if re.match('[ATCGN]', Seq):
                             RSeqs += 1
-                        if name[0] in FSeqs:
-                            if len(Seq) > cutoff:
-                                Foutfile.write("%s\n%s\n+\n%s\n" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
-                                Routfile.write("%s\n%s\n+\n%s\n" % (readbuffer[0],Seq,Qual))
-                                FinalSeqs += 1
-                            else:
-                                Shorts += 1
+                            if name[0] in FSeqs:
+                                if len(Seq) > cutoff:
+                                    Foutfile.write("%s\n%s\n+\n%s\n" % (FNames[name[0]],FSeqs[name[0]],FQuals[name[0]]))
+                                    Routfile.write("%s\n%s\n+\n%s\n" % (readbuffer[0],Seq,Qual))
+                                    FinalSeqs += 1
+                                else:
+                                    Shorts += 1
                         readbuffer = []
                 print(reads, 'total raw reads.')
         Foutfile.close()

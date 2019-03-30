@@ -5,4 +5,4 @@ My PhD included the development and testing of environmental DNA assays for the 
 
 *metatrim.py* trims primers and spacer inserts from Illumina paired end HTS reads. There are several methods for this program, which also works as a module that you can import and use various functions from. See the metatrimREADME
 
-*SeqTabToFasta.pl* creates individual fasta files with amplicon sequence variants (ASVs) generated from the HTS reads merging program DADA2. The input (SeqTabNoChim.txt) is the sequence table output from DADA2 in tab delimited format.
+*SeqTabToFasta.pl* creates individual fasta files with amplicon sequence variants (ASVs) generated from the HTS reads merging program DADA2. The input (SeqTab.txt) is the sequence table output from DADA2 in tab delimited format.

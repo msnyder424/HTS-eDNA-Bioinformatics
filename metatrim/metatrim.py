@@ -26,12 +26,18 @@ https://github.com/msnyder424/HTS-eDNA-Bioinformatics/tree/master/metatrim
 """
 
 import re
-from itertools import permutations
+import pip
 import sys
 import gzip
 import os
 import operator
 from datetime import datetime
+try:
+    from sympy.utilities.iterables import multiset_permutations
+except ImportError:
+    print ('Installing dependency: sympy')
+    os.system('pip install sympy')
+    from sympy.utilities.iterables import multiset_permutations
 
 if __name__ != '__main__':
     print("MetaTrim takes the following variables:\n\
@@ -72,13 +78,13 @@ retailer, and manager implications"
 PrimerSets = {
 	'ACTSPART-2': ['TNACNTTCCGN','CNCCAATTCAN','53'],
     'MIFISHPART-2': ['TCGTGCCAGCN','TCCCAGTTTGN','0'],
-    'ACTLPART-2': ['GMTCHATYCCN','CNCCAATTCAN','150'],
+    'ACTLPART-2': ['CTHCGMTCHATYCCN','CNCCAATTCAN','150'],
     'GOBIPART-2': ['TWAAAATYGCN','ACRTCWCGRCN','165'],
     'CYPPART-2': ['CYCTHCTAGGN','CYCCRTTRGCN','134'],
     'CYPCOMPLETE': ['TGATGAAAYTTYGGMTCYCTHCTAGG','AARAAGAATGATGCYCCRTTRGC','136'],
     'GOBICOMPLETE': ['AACVCAYCCVCTVCTWAAAATYGC','AGYCANCCRAARTTWACRTCWCGRC','165'],
     'MIFISHPART': ['TCGTGCCAGC','TCCCAGTTTG','0'],
-    'ACTLPART': ['GMTCHATYCC','CNCCAATTCA','152'],
+    'ACTLPART': ['CTHCGMTCHATYCC','CNCCAATTCA','152'],
     'GOBIPART': ['TWAAAATYGC','ACRTCWCGRC','167'],
     'CYPPART': ['CYCTHCTAGG','CYCCRTTRGC','136'],
     'CYPCOMPLETE': ['TGATGAAAYTTYGGMTCYCTHCTAGG','AARAAGAATGATGCYCCRTTRGC','136'],
@@ -220,25 +226,19 @@ def DegPrimers (PrimDict, ErrDict):
                         PrimDeg.append(0)
                     else:
                         PrimDeg.append(1)
-                Perms = permutations(PrimDeg)
-                for i in Perms:
-                    if i in PrimDegDict:
-                        continue
-                    else:
-                        PrimDegDict[i] = 1
-            for i in PrimDegDict:
-                DegCurr = list(i)
-                for n in range(len(DegCurr)):
-                    if DegCurr[n] == 0:
-                        DegCurr[n] = '[ACTGN]'
+            Perms = list(multiset_permutations(PrimDeg))
+            for i in Perms:
+                for n in range(len(i)):
+                    if i[n] == 0:
+                        i[n] = '[ACTGN]'
                     else:
                         if PrimCurr[n] in IUPACAmb:  
-                            DegCurr[n] = IUPACAmb[PrimCurr[n]]
+                            i[n] = IUPACAmb[PrimCurr[n]]
                         else:
-                            DegCurr[n] = PrimCurr[n]
-                DegPrimers.append(''.join(DegCurr))
+                            i[n] = PrimCurr[n]
+                DegPrimers.append(''.join(i))
                 DegPrim = '|'.join(DegPrimers)
-            DegPrimerDict[keys] = '('+DegPrim+')'
+            DegPrimerDict[keys] = DegPrimers
         else:
             DegCurr = []
             for n in PrimCurr:
@@ -258,22 +258,26 @@ def TrimPrimers (Primer1,Primer2):
     global TrimmedSeq
     global Seq
     global Qual
-    if re.search(DegPrimerDict[Primer1], readbuffer[1]):
-        name = readbuffer[0].split()
-        TargetStart = re.search(DegPrimerDict[Primer1], readbuffer[1]).end()
-        if Length == 0:
-            RevComp(readbuffer[1])
-            if re.search(DegPrimerDict[Primer2], SeqRC):
-                TargetEnd = len(readbuffer[1]) - re.search(DegPrimerDict[Primer2], SeqRC).end()
+    for prim1 in DegPrimerDict[Primer1]:
+        if re.search(prim1, readbuffer[1]):
+            name = readbuffer[0].split()
+            TargetStart = re.search(prim1, readbuffer[1]).end()+1
+            if Length == 0:
+                RevComp(readbuffer[1])
+                for prim2 in DegPrimerDict[Primer2]:
+                    if re.search(prim2, SeqRC):
+                        TargetEnd = len(readbuffer[1])-re.search(prim2, SeqRC).end()-1
+                        break
+                    else:
+                        TargetEnd = len(readbuffer[1])
             else:
-                TargetEnd = len(readbuffer[1])
+                TargetEnd = TargetStart + int(Length)
+            Seq = readbuffer[1][TargetStart:TargetEnd]
+            Qual = readbuffer[3][TargetStart:TargetEnd]
+            break
         else:
-            TargetEnd = TargetStart + int(Length)
-        Seq = readbuffer[1][TargetStart:TargetEnd]
-        Qual = readbuffer[3][TargetStart:TargetEnd]
-    else:
-        Seq = 'X'
-        name = readbuffer[0].split()
+            Seq = 'X'
+            name = readbuffer[0].split()
 
 def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spacers):
     start = datetime.now().time()

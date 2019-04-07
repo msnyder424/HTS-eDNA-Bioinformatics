@@ -26,7 +26,7 @@ Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos O
 
 
 #### *To trim primers from a single sample use ***metatrim*** from a python interpreter:* ####
-`MetaTrim(In_Forward In_Reverse Primer_Set F_Seq R_Seq F_Err R_Err Length Spacers)`
+`MetaTrim(In_Forward, In_Reverse, Primer_Set, F_Seq R_Seq, F_Err, R_Err, Length Spacers)`
 
 In_Forward: Path to forward (R1_001.fastq.gz) file.    
 In_Reverse: Path to reverse (R2_001.fastq.gz) file.   
@@ -53,7 +53,7 @@ or
 #### *To add a new primer set to the primer set list:* ####
 `python metatrim.py New Primer_Set_Name F_Seq R_Seq Length`  
 or  
-`AddPrimer(Primer_Set_Name F_Seq R_Seq Length)`  
+`AddPrimer(Primer_Set_Name, F_Seq, R_Seq, Length)`  
 
 Primer_Set_Name: Name your new primer set  
 F_Seq: Last N bases of forward primer   

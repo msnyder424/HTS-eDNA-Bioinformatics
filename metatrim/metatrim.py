@@ -258,12 +258,12 @@ def TrimPrimers (Primer1,Primer2):
     for prim1 in DegPrimerDict[Primer1]:
         if re.search(prim1, readbuffer[1]):
             name = readbuffer[0].split()
-            TargetStart = re.search(prim1, readbuffer[1]).end()+1
+            TargetStart = re.search(prim1, readbuffer[1]).end()
             if Length == 0:
                 RevComp(readbuffer[1])
                 for prim2 in DegPrimerDict[Primer2]:
                     if re.search(prim2, SeqRC):
-                        TargetEnd = len(readbuffer[1])-re.search(prim2, SeqRC).end()-1
+                        TargetEnd = len(readbuffer[1])-re.search(prim2, SeqRC).end()
                         break
                     else:
                         TargetEnd = len(readbuffer[1])

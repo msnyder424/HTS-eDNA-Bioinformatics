@@ -39,7 +39,7 @@ Length: Length of marker OR primer set name to use a predefined length OR if len
 Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos One?: Yes(Y) or No(N). This option allows the removal of index hops!  
 
 #### *To count spacers in a single fastq file* ####
-*This feature is a function that cannot be called directly from __main__*  
+*This feature is a function that cannot be called directly from \_\_main\_\_*  
 `SpacerCount(In_fastq.gz)`  
 
 In_fastq.gz: Path to fastq.gz file for which you want to count spacers.

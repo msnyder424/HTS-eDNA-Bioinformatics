@@ -237,7 +237,6 @@ def DegPrimers (PrimDict, ErrDict):
                         else:
                             i[n] = PrimCurr[n]
                 DegPrimers.append(''.join(i))
-                DegPrim = '|'.join(DegPrimers)
             DegPrimerDict[keys] = DegPrimers
         else:
             DegCurr = []
@@ -246,9 +245,7 @@ def DegPrimers (PrimDict, ErrDict):
                     DegCurr.append(IUPACAmb[n])
                 else:
                     DegCurr.append(n)
-            DegPrimers.append(''.join(DegCurr))
-            DegPrim = '|'.join(DegPrimers)
-            DegPrimerDict[keys] = '('+DegPrim+')'
+            DegPrimerDict[keys] = ''.join(DegCurr)
 
 #Function to trim primers
 def TrimPrimers (Primer1,Primer2):

@@ -56,8 +56,8 @@ or
 `AddPrimer(Primer_Set_Name, F_Seq, R_Seq, Length)`  
 
 Primer_Set_Name: Name your new primer set  
-F_Seq: Last N bases of forward primer   
-R_Seq: Last N bases of reverse primer  
+F_Seq: Last N bases of forward primer. ≥8 is recomended.   
+R_Seq: Last N bases of reverse primer. ≥8 is recomended.  
 Length: Length of marker OR primer set name to use a predefined length OR if length is variable, enter 0 and ***metatrim*** will search for the opposite primer in each forward and reverse read. If the primer is not found it will take the remainder of the sequence after the first primer is found. **WARNING:** if you choose to have ***metatrim*** search for the opposite primer in each read, you should ensure it is never found at any other location than is intended.  
 *It is recommended that you input 8-10 bases of each primer. The sequence should end with the last 3' base of the primer.*  
 

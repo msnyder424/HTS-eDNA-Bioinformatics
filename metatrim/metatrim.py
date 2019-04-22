@@ -218,7 +218,9 @@ def DegPrimers (PrimDict, ErrDict):
         DegPrimers = []
         PrimCurr = list(PrimDict[keys])
         PrimDegDict = {}
+        Perms = []
         if ErrDict[keys] > 0:
+            DegPrimerDict[keys] = []
             for err in range(0, ErrDict[keys]+1):
                 PrimDeg = []
                 for bp in range(len(PrimDict[keys])):
@@ -226,18 +228,19 @@ def DegPrimers (PrimDict, ErrDict):
                         PrimDeg.append(0)
                     else:
                         PrimDeg.append(1)
-            Perms = list(multiset_permutations(PrimDeg))
-            for i in Perms:
-                for n in range(len(i)):
-                    if i[n] == 0:
-                        i[n] = '[ACTGN]'
-                    else:
-                        if PrimCurr[n] in IUPACAmb:  
-                            i[n] = IUPACAmb[PrimCurr[n]]
+                PermsTemp = list(multiset_permutations(PrimDeg))
+                Perms.extend(PermsTemp)
+                for i in Perms:
+                    for n in range(len(i)):
+                        if i[n] == 0:
+                            i[n] = '[ACTGN]'
                         else:
-                            i[n] = PrimCurr[n]
-                DegPrimers.append(''.join(i))
-            DegPrimerDict[keys] = DegPrimers
+                            if PrimCurr[n] in IUPACAmb:  
+                                i[n] = IUPACAmb[PrimCurr[n]]
+                            else:
+                                i[n] = PrimCurr[n]
+                    DegPrimers.append(''.join(i))
+                DegPrimerDict[keys].append('('+'|'.join(DegPrimers)+')')
         else:
             DegCurr = []
             for n in PrimCurr:

@@ -280,7 +280,6 @@ def TrimPrimers (Primer1,Primer2):
             name = readbuffer[0].split()
 
 def MetaTrim(InForward, InReverse, PrimerSet, PF, PR, ErrF, ErrR, TargetLen, Spacers):
-    start = datetime.now().time()
     PrimerSet = PrimerSet.upper()
     global Length
     global PrimerDict
@@ -518,6 +517,7 @@ To remove a primer set from the list input the following argument variables: \n\
 1. Remove. \n\
 2. Primer_Set_Name")
     else:
+	#Get start time of script
         start = datetime.now().time()
         #Add a new primer to the primer set list
         if sys.argv[1].upper() == 'PRIMERSETS':
@@ -632,7 +632,7 @@ Seqs w/ Correct Spacer Combo\tSeqs w/o Correct Spacer Combo\n')
                             MetaTrim(InF, InR, sys.argv[1].upper(), sys.argv[3].upper(), sys.argv[4].upper(), \
                                 sys.argv[4], sys.argv[5], LengthMarker, sys.argv[7].upper())
         outsum.close()
-
+        #Get time script finishes and print start and end time
         end = datetime.now().time()
         print ('MetaTrim start:', start, '\n', 'MetaTrim end:', end)
     

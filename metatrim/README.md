@@ -10,7 +10,7 @@
 
 ***metatrim*** requires one package that is not in the Python standard library. If this package is not installed in your environment it will be the first time you run ***metatrim***. Therefore, you must have the appropriate permissions to install Python packages the first time you use ***metatrim***.
 
-***metatrim*** trims paired end metabarcoding reads returned from Illumina sequencing for subsequent merging in other programs such as Dada2, Unoise, or OBITools. ***metatrim*** works on the parent directory level. It should be run from the parent directory in which all of your subdirectories with Illumina sequencing results are stored. If you want to use individual functions from ***metatrim*** you can import it as a module. This allows you to trim individual sets of paired sequencing results files. ***metatrim*** handles zipped fastq.gz files. It will deposit your trimmed meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published in Klymus *et al.* 2017, *Plos One*, **12**(5): e0177643, you can use those inserts to remove instances of index hops. The most effective method of library prep for removing index hops is to combine every forward spacer with every reverse spacer. ***All inputs are case INsensitive!***
+***metatrim*** trims paired end metabarcoding reads returned from Illumina sequencing for subsequent merging in other programs such as Dada2, Unoise, or OBITools. ***metatrim*** works on the parent directory level. It should be run from the parent directory in which all of your subdirectories with Illumina sequencing results are stored. If you want to use individual functions from ***metatrim*** you can import it as a module. This allows you to trim individual sets of paired sequencing results files. ***metatrim*** handles zipped fastq.gz files. It will deposit your trimmed meta-barcoding results as unzipped fastq files into a new subdirectory named with your parent directory name and 'TrimmedFastqs'. If you have used primers with identical spacer inserts to those published in Klymus *et al.* 2017, *Plos One*, **12**(5): e0177643, you can use those inserts to remove instances of index hops. The most effective method of library prep for removing index hops is to combine every forward spacer with every reverse spacer. ***All inputs are case INsensitive! fastq.gz files must use the demultiplexed illumina naming convention (forward read file ends in R1.001.fastq.gz, reverse read file ends in R2_001.fastq.gz)***
 
 
 #### *To trim primers from multiple Illumina HTS result files use **metatrim** as a stand alone script from the parent directory containing subdirectories for each sample with fastq.gz files:* ####
@@ -28,8 +28,8 @@ Spacers: Are you using spacer inserts as published in Klymus et al. 2017, Plos O
 #### *To trim primers from a single sample use ***metatrim*** from a python interpreter:* ####
 `MetaTrim(In_Forward, In_Reverse, Primer_Set, F_Seq R_Seq, F_Err, R_Err, Length Spacers)`
 
-In_Forward: Path to forward (R1_001.fastq.gz) file.    
-In_Reverse: Path to reverse (R2_001.fastq.gz) file.   
+In_Forward: Path to forward ([...]_R1_001.fastq.gz) file.    
+In_Reverse: Path to reverse ([...]_R2_001.fastq.gz) file.   
 Primer_Set: Primer set name or "other" if it is not in the common primer set list. If a primer set name is entered, the next two variables will be ignored, but a value must be entered.  
 F_Seq: Last N bases of forward primer. ≥8 is recomended.   
 R_Seq: Last N bases of reverse primer. ≥8 is recomended.  

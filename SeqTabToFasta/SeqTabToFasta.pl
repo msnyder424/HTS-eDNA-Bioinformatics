@@ -14,7 +14,7 @@ my $Infile = "SeqTab.txt";
 
 open (IN, $Infile) || die "Can't open $Infile: $!\n"; 
 
-my $OTUsDir = basename(getcwd)."Dada2OTUs";
+my $OTUsDir = basename(getcwd)."Dada2ASVs";
 mkdir $OTUsDir unless -d $OTUsDir;
 
 my $c=0;

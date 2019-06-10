@@ -8,7 +8,7 @@ use File::Basename;
 
 my $Out = "Dada2OTUSummary.txt";
 open (OUTSUM, ">", $Out) || die "Can't open $Out: $!\n";
-print OUTSUM "Sample\tN no chim reads\tN no chim OTUs\n";
+print OUTSUM "Sample\tN reads\tN ASVs\n";
 
 my $Infile = "SeqTab.txt";
 
